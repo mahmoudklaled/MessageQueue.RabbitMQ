@@ -1,9 +1,20 @@
+using Microsoft.EntityFrameworkCore;
+using Inventory.Api.Database;
+using Inventory.Api.Services;
+using Inventory.Api.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+builder.Services.AddDbContext<ApplicationDbContext>(o =>
+    o.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
+builder.Services.AddScoped<IProducts, Products>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -21,5 +32,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.ApplyMigrations();
 
 app.Run();
