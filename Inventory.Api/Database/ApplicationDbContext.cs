@@ -8,6 +8,6 @@ namespace Inventory.Api.Database
         {
         }
 
-        public DbSet<Common.Models.Product> Products { get; set; }
+        public DbSet<Common.Models.Product> ProductsTbl { get; set; }
     }
 }

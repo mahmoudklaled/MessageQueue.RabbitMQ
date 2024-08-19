@@ -3,24 +3,26 @@
 #Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
 #For more information, please see https://aka.ms/containercompat
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-nanoserver-1809 AS base
+# Base runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
-ARG BUILD_CONFIGURATION=Release
+# Build image
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["Product.Api/Product.Api.csproj", "Product.Api/"]
-RUN dotnet restore "./Product.Api/./Product.Api.csproj"
+RUN dotnet restore "Product.Api/Product.Api.csproj"
 COPY . .
 WORKDIR "/src/Product.Api"
-RUN dotnet build "./Product.Api.csproj" -c %BUILD_CONFIGURATION% -o /app/build
+RUN dotnet build "Product.Api.csproj" -c Release -o /app/build
 
+# Publish image
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Product.Api.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Product.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
+# Final runtime image
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .

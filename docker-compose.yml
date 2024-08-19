@@ -1,0 +1,107 @@
+#version: '3.4'
+
+# services:
+#   inventory.api:
+#     image: ${DOCKER_REGISTRY-}inventoryapi
+#     build:
+#       context: .
+#       dockerfile: Inventory.Api\Dockerfile
+#     ports:
+#     - "5001:443"
+
+#   product.api:
+#     image: ${DOCKER_REGISTRY-}productapi
+#     build:
+#       context: .
+#       dockerfile: Product.Api\Dockerfile
+#     ports:
+#     - "6001:443"
+
+#   inventory-db:
+#     image: mcr.microsoft.com/mssql/server:2022-latest
+#     container_name: inventory.Db
+#     volumes:
+#         - ./.containers/database:/var/opt/mssql/data
+#     ports:
+#         - "1433:1433"
+#     environment:
+#         ACCEPT_EULA: "Y"
+#         SA_PASSWORD: "Strong_password_123!"
+
+#   product-db:
+#     image: mcr.microsoft.com/mssql/server:2022-latest
+#     container_name: product.Db
+#     volumes:
+#          - ./.containers/database:/var/opt/mssql/data
+#     ports:
+#          - "1433:1433"
+#     environment:
+#         ACCEPT_EULA: "Y"
+#         SA_PASSWORD: "Strong_password_123!"
+        
+#   inventory-mq:
+#     image: rabbitmq:management
+#     container_name: inventory.RabbitMq
+#     hostname: inventory-mq
+#     volumes:
+#         - ./.containers/queue/data/:/var/lib/rabbitmq
+#         - ./.containers/queue/log/:/var/log/rabbitmq
+#     environment:
+#         RABBITMQ_DEFAULT_USER: guest
+#         RABBITMQ_DEFAULT_PASS: guest
+
+# docker-compose.yml
+
+version: '3.4'
+
+services:
+  inventory.api:
+    image: ${DOCKER_REGISTRY-}inventory-api
+    build:
+      context: .
+      dockerfile: Inventory.Api/Dockerfile
+    ports:
+      - "5056:443"
+
+  product.api:
+    image: ${DOCKER_REGISTRY-}product-api
+    build:
+      context: .
+      dockerfile: Product.Api/Dockerfile
+    ports:
+      - "6060:443"
+
+  inventory-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: inventory.db
+    volumes:
+      - ./.containers/inventory-db-data:/var/opt/mssql/data
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Strong_password_123!"
+
+  product-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: product.db
+    volumes:
+      - ./.containers/product-db-data:/var/opt/mssql/data
+    ports:
+      - "1453:1433"  # Changed to avoid port conflict with inventory-db
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Strong_password_123!"
+        
+  inventory-mq:
+    image: rabbitmq:management
+    container_name: inventory.rabbitmq
+    hostname: inventory-mq
+    volumes:
+      - ./.containers/queue/data/:/var/lib/rabbitmq
+      - ./.containers/queue/log/:/var/log/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+

@@ -16,6 +16,21 @@ namespace Product.Api.Services
             _applicationDbContext = applicationDbContext;
         }
 
+        public async Task AddAsync(Common.Models.Product product)
+        {
+            try
+            {
+                await _applicationDbContext.Products.AddAsync(product);
+
+                var result = await _applicationDbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                //ignore
+            }
+        }
+
+
         public async Task<TResult<IList<ProductDto>>> GetAllAsync()
         {
             var products = await _applicationDbContext.Products.ToListAsync();
